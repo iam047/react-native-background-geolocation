@@ -25,7 +25,7 @@
 
 @implementation RCTBackgroundGeolocation {
     MAURBackgroundGeolocationFacade* facade;
-    
+
     API_AVAILABLE(ios(10.0))
     __weak id<UNUserNotificationCenterDelegate> prevNotificationDelegate;
 }
@@ -41,7 +41,7 @@ RCT_EXPORT_MODULE();
     if (self) {
         facade = [[MAURBackgroundGeolocationFacade alloc] init];
         facade.delegate = self;
-        
+
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAppPause:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAppResume:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onFinishLaunching:) name:UIApplicationDidFinishLaunchingNotification object:nil];
@@ -62,7 +62,7 @@ RCT_EXPORT_METHOD(configure:(NSDictionary*)configDictionary success:(RCTResponse
     RCTLogInfo(@"RCTBackgroundGeolocation #configure");
     MAURConfig* config = [MAURConfig fromDictionary:configDictionary];
     NSError *error = nil;
-    
+
     if ([facade configure:config error:&error]) {
         success(@[[NSNull null]]);
     } else {
@@ -97,7 +97,7 @@ RCT_EXPORT_METHOD(stop)
     }
 }
 
-RCT_EXPORT_METHOD(switchMode:(NSNumber*)mode success:(RCTResponseSenderBlock)success failure:(RCTResponseSenderBlock)failure)
+RCT_EXPORT_METHOD(switchMode:(NSNumber* _Nonnull)mode success:(RCTResponseSenderBlock)success failure:(RCTResponseSenderBlock)failure)
 {
     RCTLogInfo(@"RCTBackgroundGeolocation #switchMode");
     [facade switchMode:[mode integerValue]];
@@ -195,7 +195,7 @@ RCT_EXPORT_METHOD(getCurrentLocation:(NSDictionary*)options success:(RCTResponse
         }
     });
 }
-                   
+
 RCT_EXPORT_METHOD(getStationaryLocation:(RCTResponseSenderBlock)success failure:(RCTResponseSenderBlock)failure)
 {
     RCTLogInfo(@"RCTBackgroundGeolocation #getStationaryLocation");
@@ -313,7 +313,7 @@ RCT_EXPORT_METHOD(forceSync:(RCTResponseSenderBlock)success failure:(RCTResponse
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
     NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
-    
+
     return [basePath stringByAppendingPathComponent:@"SQLiteLogger"];
 }
 
@@ -376,7 +376,7 @@ RCT_EXPORT_METHOD(forceSync:(RCTResponseSenderBlock)success failure:(RCTResponse
 - (void) onAbortRequested
 {
     RCTLogInfo(@"RCTBackgroundGeoLocation abort requested by the server");
-    
+
     if (_bridge)
     {
         [self sendEvent:@"abort_requested"];
@@ -390,7 +390,7 @@ RCT_EXPORT_METHOD(forceSync:(RCTResponseSenderBlock)success failure:(RCTResponse
 - (void) onHttpAuthorization
 {
     RCTLogInfo(@"RCTBackgroundGeoLocation http authorization");
-    
+
     if (_bridge)
     {
         [self sendEvent:@"http_authorization"];
@@ -403,7 +403,7 @@ RCT_EXPORT_METHOD(forceSync:(RCTResponseSenderBlock)success failure:(RCTResponse
 -(void) onFinishLaunching:(NSNotification *)notification
 {
     NSDictionary *dict = [notification userInfo];
-    
+
     MAURConfig *config = [facade getConfig];
     if (config.isDebugging)
     {
@@ -414,7 +414,7 @@ RCT_EXPORT_METHOD(forceSync:(RCTResponseSenderBlock)success failure:(RCTResponse
             center.delegate = self;
         }
     }
-    
+
     if ([dict objectForKey:UIApplicationLaunchOptionsLocationKey]) {
         RCTLogInfo(@"RCTBackgroundGeolocation started by system on location event.");
         if (![config stopOnTerminate]) {
@@ -431,7 +431,7 @@ RCT_EXPORT_METHOD(forceSync:(RCTResponseSenderBlock)success failure:(RCTResponse
     if (prevNotificationDelegate && [prevNotificationDelegate respondsToSelector:@selector(userNotificationCenter:willPresentNotification:withCompletionHandler:)])
     {
         // Give other delegates (like FCM) the chance to process this notification
-        
+
         [prevNotificationDelegate userNotificationCenter:center willPresentNotification:notification withCompletionHandler:^(UNNotificationPresentationOptions options) {
             completionHandler(UNNotificationPresentationOptionAlert);
         }];
